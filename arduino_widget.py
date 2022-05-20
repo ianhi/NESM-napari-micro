@@ -3,11 +3,22 @@ import sys
 import serial
 from qtpy import QtWidgets as QtW
 from qtpy.QtCore import Qt
-
+import numpy as np
 
 class FakeLaser:
     def __init__(self, port, baudrate=115200):
         self._arduino = serial.Serial(port, baudrate=baudrate)
+
+    def set_brightness(self, brightness:np.uint8):
+        """
+        Set the brightness of the LED.
+
+        Parameters
+        ----------
+        brightness : uint8
+            Between 0 and 255
+        """
+        self.write_serial(str(np.uint8(brightness)))
 
     def write_serial(self, msg: str):
         self._arduino.write(msg.encode())
@@ -30,7 +41,7 @@ class LaserWidget(QtW.QWidget):
 
         layout.addWidget(self.sb)
         self.sb.valueChanged.connect(lambda val: self.laser.write_serial(str(val)))
-        self.sb.valueChanged.connect(lambda val: print(val))
+        # self.sb.valueChanged.connect(lambda val: print(val))
         self.setLayout(layout)
         self.setWindowTitle("Demo Custom Widget")
 
